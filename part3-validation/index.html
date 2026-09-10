@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Part 3 — validating tc-automation-diff</title>
+<link rel="stylesheet" href="assets/report.css">
+</head>
+<body>
+<div class="page">
+
+  <header class="report-header">
+    <h1>Part 3 — validating <code>tc-automation-diff</code></h1>
+    <div class="scope-note">
+      Real runs of the <code>tc-automation-diff</code> skill (see
+      <code>.claude/skills/tc-automation-diff/</code>) against three of Part 1's own
+      manual-TC/automation pairs, plus one deliberately mismatched pair to prove the skill
+      actually catches a discrepancy rather than rubber-stamping everything.
+    </div>
+  </header>
+
+  <h2>Clean pairs (skill reports full coverage, no mismatches)</h2>
+
+  <div class="pair-card">
+    <h3>Valid login</h3>
+    <p><code>manual-test-cases/valid-login.md</code> vs. <code>test/specs/login.spec.js</code> → <code>should log in with valid credentials</code></p>
+    <p><span class="badge badge-match">✅ 2 of 2 MATCH</span></p>
+    <a class="report-link" href="valid-login-report.html">View report →</a>
+  </div>
+
+  <div class="pair-card">
+    <h3>Invalid login</h3>
+    <p><code>manual-test-cases/invalid-login.md</code> vs. <code>test/specs/login.spec.js</code> → <code>should NOT log in with an invalid password</code></p>
+    <p><span class="badge badge-match">✅ 3 of 3 MATCH</span></p>
+    <a class="report-link" href="invalid-login-report.html">View report →</a>
+  </div>
+
+  <div class="pair-card">
+    <h3>Search suggestions</h3>
+    <p><code>manual-test-cases/search-suggestions.md</code> vs. <code>test/specs/search.spec.js</code> → <code>should show a suggestions dropdown...</code></p>
+    <p><span class="badge badge-match">✅ 3 of 3 MATCH</span></p>
+    <a class="report-link" href="search-suggestions-report.html">View report →</a>
+  </div>
+
+  <p class="context-note">Each of these three came back <strong>fully matched, zero mismatches</strong> — expected, since the manual TCs were written to describe exactly what the real automation does.</p>
+
+  <h2>Deliberately broken pair (proves the skill catches a real mismatch)</h2>
+
+  <div class="pair-card">
+    <h3>Valid login — BROKEN copy</h3>
+    <p><code>manual-test-cases/valid-login-BROKEN.md</code> is a copy of <code>valid-login.md</code> with Step 2's Expected column changed from "no error message is displayed" to "the user is redirected to <code>/profile</code>" — a claim the real <code>login.spec.js</code> never checks (it only closes the modal in place; the actual <code>/profile</code> redirect is a <em>different</em> flow, tested separately in <code>navigation.spec.js</code>).</p>
+    <p>Run against the <strong>same, unmodified</strong> <code>test/specs/login.spec.js</code>:</p>
+    <p>
+      <span class="badge badge-match">✅ 1 MATCH</span>
+      <span class="badge badge-mismatch">⚠️ 1 MISMATCH</span>
+    </p>
+    <a class="report-link" href="valid-login-BROKEN-report.html">View report →</a>
+  </div>
+
+  <p class="context-note">
+    Result: <strong>1 of 2 steps matched, 1 flagged as MISMATCH</strong>, with the report
+    correctly identifying both that the assertion at that position checks something unrelated,
+    and that no redirect check exists anywhere in the test at all. The skill did not silently
+    pass this pair.
+  </p>
+
+  <h2>What this demonstrates</h2>
+  <ul>
+    <li>The skill doesn't just check "does a spec file exist for this TC" — it reads the actual assertions and compares what they verify against what the manual TC claims.</li>
+    <li>A single-field edit to the manual TC (no code touched) was enough to flip the verdict from full coverage to a flagged mismatch, on the very same automation file.</li>
+  </ul>
+
+  <footer class="report-footer">
+    Markdown source for these reports lives alongside this page in <code>part3-validation/</code>.
+    See <a href="README.md">README.md</a> for the plain-text writeup.
+  </footer>
+
+</div>
+</body>
+</html>

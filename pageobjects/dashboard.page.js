@@ -2,15 +2,19 @@ const Page = require('./page');
 const { base: TIMEOUTS } = require('./constants/timeouts');
 
 /**
- * Logged-in storefront: login state, logout, and product search.
+ * Logged-in storefront: login state, account navigation, and product search.
  */
 class DashboardPage extends Page {
   get profileIcon() {
     return $('.profile-btn-main-page img');
   }
 
-  get logoutOption() {
-    return $('.logout-option');
+  get profileLink() {
+    return $('a[href="/profile"]');
+  }
+
+  get accountDropdown() {
+    return $('.profile-menu-dropdown');
   }
 
   get searchInput() {
@@ -31,11 +35,15 @@ class DashboardPage extends Page {
     return (iconSrc || '').includes('user_isauth');
   }
 
-  /** Opens the account menu via the header button and clicks "Вийти" (logout). */
-  async logout() {
+  /** Opens the account dropdown via the header button, then navigates to the profile page. */
+  async openProfile() {
     await this.headerAuthButton.click();
-    await this.logoutOption.waitForClickable();
-    await this.logoutOption.click();
+    await this.profileLink.waitForClickable();
+    await this.profileLink.click();
+    await browser.waitUntil(async () => (await browser.getUrl()).includes('/profile'), {
+      timeout: TIMEOUTS.DEFAULT_TIMEOUT,
+      timeoutMsg: 'navigation to /profile never happened',
+    });
   }
 
   /** Types a search term and waits for the suggestions dropdown to show at least one tag. */
