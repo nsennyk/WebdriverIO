@@ -1,0 +1,6 @@
+node_modules/
+.env
+wdio-logs/
+allure-results/
+allure-report/
+.DS_Store

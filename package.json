@@ -1,0 +1,20 @@
+{
+  "name": "webdriverio-aqa-course",
+  "version": "1.0.0",
+  "description": "WebdriverIO/JS port of the Python aqa_course pet project — UI automation against flagman.kiev.ua",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "wdio run ./wdio.conf.js",
+    "test:headless": "HEADLESS=true wdio run ./wdio.conf.js"
+  },
+  "author": "Nazar Sennyk",
+  "license": "ISC",
+  "devDependencies": {
+    "@wdio/cli": "^9.5.0",
+    "@wdio/local-runner": "^9.5.0",
+    "@wdio/mocha-framework": "^9.5.0",
+    "@wdio/spec-reporter": "^9.5.0",
+    "dotenv": "^16.4.5"
+  }
+}
