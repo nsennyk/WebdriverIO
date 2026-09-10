@@ -1,4 +1,4 @@
-# webdriverIO-aqa
+# WebdriverIO-aqa
 
 WebdriverIO UI automation practice project — logs into and searches
 [flagman.ua](https://flagman.ua/) (a real storefront, used here for learning purposes only).
