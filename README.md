@@ -24,6 +24,68 @@ WebdriverIO UI automation practice project — logs into and searches
   `part3-validation/assets/report.css`, supports dark mode) — same content either way, pick
   whichever is easier to read.
 
+## Implementation Walkthrough
+
+This section documents the reasoning and sequence behind the implementation. The goal was not
+only to make the tests pass, but to leave a small project that shows how manual scenarios can be
+turned into maintainable UI automation and then checked for coverage.
+
+### 1. Choosing the scope
+
+I selected the login, validation, navigation, and product-search flows on `flagman.ua`. These
+flows cover different kinds of end-to-end behavior: successful and unsuccessful authentication,
+form validation, navigation to another page, and an asynchronous search interaction. Before
+writing the specs, I wrote `TEST_PLAN.md` so that the intended behavior was defined separately
+from the implementation.
+
+### 2. Designing the tests
+
+The five scenarios were implemented with WebdriverIO and Mocha. I used the Page Object Model to
+keep selectors and browser interactions close to the page that owns them, while keeping the spec
+files focused on business-level scenarios. Shared waits, test data, and common interactions were
+also extracted so the tests do not depend on arbitrary `pause()` calls or scattered magic values.
+
+Each test contains multiple meaningful assertions. Depending on the scenario, the assertions
+check a combination of URL, page title, visible text, authentication state, error state, or the
+presence of search suggestions. This makes a test verify the complete outcome instead of merely
+proving that one element exists.
+
+### 3. Handling real application behavior
+
+While checking the flows against the live site, I adjusted the implementation to match the
+application rather than idealized assumptions. The phone input uses a mask, so ordinary
+`setValue()` was not consistently processed; the shared typing helper sends real key events
+instead. Login waits for either the modal to close or a validation error to appear, which avoids
+asserting against stale UI. The search test checks the debounced suggestion dropdown instead of
+hard-coding a fragile result list, and the navigation test asserts the actual `/profile` page
+markup rather than selectors that only exist on the homepage.
+
+### 4. Building the comparison skill
+
+For Part 2, I created the `tc-automation-diff` Claude Skill. It receives a manual test case and
+the corresponding WebdriverIO file, then compares the manual steps and expected results with the
+actions and assertions expressed in the automation. Its report separates missing manual steps,
+inconsistent expectations or ordering, and extra automation behavior. The skill's README
+documents the input format, output structure, invocation examples, and limitations such as the
+fact that the comparison is based on the meaning expressed in the files and cannot observe
+runtime behavior by itself.
+
+### 5. Validating the skill
+
+For Part 3, I prepared manual test cases for several Part 1 scenarios and ran the skill against
+each matching automation file. The clean pairs demonstrate that the intended coverage is
+recognized. I then copied the valid-login manual case and deliberately changed its expected
+result to require a redirect to `/profile`, while leaving the automation unchanged. The generated
+`valid-login-BROKEN-report` flags that expectation as uncovered, demonstrating that the skill can
+detect a real discrepancy instead of approving every pair.
+
+### 6. What this demonstrates
+
+The final structure connects three layers of quality work: a written test plan explains the
+intended coverage, WebdriverIO verifies the behavior in a browser, and the Claude Skill checks
+whether the automation still represents the manual cases. Keeping those artifacts together makes
+the project easier to review and gives future changes a clear reference point.
+
 ## Stack
 
 - [WebdriverIO](https://webdriver.io/) v9 (`@wdio/cli`, local runner)
